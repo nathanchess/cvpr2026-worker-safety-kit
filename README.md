@@ -1,10 +1,10 @@
 <p align="center">
   <a href="https://twelvelabs.io">
-    <img src="https://asset.brandfetch.io/id1JWy2F7B/idQnB8HAdU.png" alt="TwelveLabs" height="60">
+    <img src="assets/tl_logo_black.png" alt="TwelveLabs" height="60">
   </a>
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <a href="https://voxel51.com">
-    <img src="https://asset.brandfetch.io/idNxBPzhFQ/idgmBpMvUV.svg" alt="Voxel51" height="60">
+    <img src="assets/VOXEL51.jpg" alt="Voxel51" height="60">
   </a>
 </p>
 
@@ -13,6 +13,10 @@
 > **Semantic Dataset Curator & Visualizer using TwelveLabs + FiftyOne**
 
 This project demonstrates an end-to-end workflow for building high-quality training sets from raw surveillance footage **without manual video scrubbing**. It serves as the primary enablement asset for the **3rd CV4Smalls Workshop @ CVPR 2026** Worker Safety Challenge.
+
+<p align="center">
+  <img src="assets/preview.png" alt="FiftyOne Preview" width="800">
+</p>
 
 ## 🎯 Strategic Goal
 
@@ -174,6 +178,22 @@ print(f"Label: {sample['label_str']}")
 - **Event**: 3rd CV4Smalls Workshop @ CVPR 2026
 - **Track**: Worker Safety Challenge
 - **Objective**: Build efficient video classifiers from small, curated datasets
+
+## 🔌 FiftyOne + Twelve Labs Plugin
+
+For enhanced semantic video search capabilities directly within FiftyOne, check out the official **FiftyOne + Twelve Labs Plugin**:
+
+```bash
+fiftyone plugins download https://github.com/danielgural/semantic_video_search
+```
+
+**Key Features:**
+- 🧠 Generate multimodal embeddings (visual, audio, OCR) from full videos
+- 🔄 Automatically split videos into meaningful clips
+- 🔍 Run semantic search over indexed videos using natural language prompts
+- 📦 Store results in clip-level FiftyOne datasets
+
+[View Plugin Repository →](https://github.com/danielgural/semantic_video_search)
 
 ## 📚 Resources
 
