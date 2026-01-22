@@ -8,11 +8,11 @@
   </a>
 </p>
 
-# CVPR 2026 Worker Safety Challenge Enablement Kit
+# Visual AI Hackathon 2026 Worker Safety Challenge Enablement Kit
 
 > **Semantic Dataset Curator & Visualizer using TwelveLabs + FiftyOne**
 
-This project demonstrates an end-to-end workflow for building high-quality training sets from raw surveillance footage **without manual video scrubbing**. It serves as the primary enablement asset for the **3rd CV4Smalls Workshop @ CVPR 2026** Worker Safety Challenge.
+This project demonstrates an end-to-end workflow for building high-quality training sets from raw surveillance footage **without manual video scrubbing**. It serves as the primary enablement asset for the **2026 Visual AI Hackathon @ Northeastern** Worker Safety Challenge.
 
 <p align="center">
   <img src="assets/preview.png" alt="FiftyOne Preview" width="800">
@@ -175,7 +175,7 @@ print(f"Label: {sample['label_str']}")
 
 ## 🏆 Challenge Context
 
-- **Event**: 3rd CV4Smalls Workshop @ CVPR 2026
+- **Event**: Visual AI Hackathon @ Northeastern
 - **Track**: Worker Safety Challenge
 - **Objective**: Build efficient video classifiers from small, curated datasets
 
