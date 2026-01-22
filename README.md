@@ -199,7 +199,6 @@ fiftyone plugins download https://github.com/danielgural/semantic_video_search
 
 - [TwelveLabs Documentation](https://docs.twelvelabs.io/)
 - [FiftyOne Documentation](https://docs.voxel51.com/)
-- [CV4Smalls Workshop](https://cv4smalls.com/)
 
 ## 📄 License
 
