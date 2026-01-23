@@ -64,6 +64,7 @@ This project demonstrates an end-to-end workflow for building high-quality train
 - Python 3.9+
 - [TwelveLabs API Key](https://api.twelvelabs.io/)
 - Video dataset organized by labels
+- [Try it out in Google Colab](https://colab.research.google.com/drive/1bRoJhDJufatNOIq8zJeo0Z6zoPaKk-Em?usp=sharing)
 
 ### Installation
 
