@@ -12,73 +12,78 @@
 
 > **Semantic Dataset Curator & Visualizer using TwelveLabs + FiftyOne**
 
-This project demonstrates an end-to-end workflow for building high-quality training sets from raw surveillance footage **without manual video scrubbing**. It serves as the primary enablement asset for the **2026 Visual AI Hackathon @ Northeastern** Worker Safety Challenge.
+This project demonstrates an end-to-end workflow for building high-quality training sets from raw surveillance footage **without manual video scrubbing**. It serves as the primary enablement asset for the **3rd CV4Smalls Workshop @ CVPR 2026** Worker Safety Challenge.
 
 <p align="center">
   <img src="assets/preview.png" alt="FiftyOne Preview" width="800">
 </p>
 
-## 🎯 Strategic Goal
+## Strategic Goal
 
 **"Small Data ≠ Manual Data"** — Modern semantic search can replace 40+ hours of manual video annotation.
 
-## 🏗️ Architecture
+By combining TwelveLabs' video understanding with FiftyOne's data management, you can:
+- Auto-generate embeddings that capture semantic content
+- Cluster similar videos without manual labeling
+- Generate zero-shot labels using video-to-text models
+- Export directly to PyTorch for training
+
+## Architecture
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│                    Video Dataset (Raw Footage)                    │
+│              FiftyOne Dataset (from Hugging Face)                │
+│                  Safe & Unsafe Behaviours Dataset                │
 └────────────────────────────┬─────────────────────────────────────┘
                              │
                              ▼
 ┌──────────────────────────────────────────────────────────────────┐
-│              TwelveLabs Video Understanding Platform              │
+│              TwelveLabs Video Understanding Platform             │
 │  ┌─────────────────────┐    ┌─────────────────────────────────┐  │
 │  │   Marengo 3.0       │    │   Pegasus 1.2                   │  │
-│  │   (Embeddings)      │    │   (Zero-shot Auto-labeling)     │  │
+│  │   512-dim Embeddings│    │   Zero-shot Auto-labeling       │  │
 │  └─────────────────────┘    └─────────────────────────────────┘  │
 └────────────────────────────┬─────────────────────────────────────┘
                              │
                              ▼
 ┌──────────────────────────────────────────────────────────────────┐
-│                     Semantic Clustering                           │
-│                  (KMeans on Embeddings)                           │
+│                     Semantic Clustering                          │
+│                  (KMeans on Embeddings)                          │
 └────────────────────────────┬─────────────────────────────────────┘
                              │
                              ▼
 ┌──────────────────────────────────────────────────────────────────┐
-│                   FiftyOne Visualization                          │
-│         (Interactive UMAP + Dataset Exploration)                  │
+│                   FiftyOne Visualization                         │
+│         (Interactive UMAP + Dataset Exploration)                 │
 └────────────────────────────┬─────────────────────────────────────┘
                              │
                              ▼
 ┌──────────────────────────────────────────────────────────────────┐
-│               PyTorch Dataset Export (.pt)                        │
-│          (Ready for classifier fine-tuning)                       │
+│              PyTorch DataLoader via to_torch()                   │
+│          (Ready for classifier fine-tuning)                      │
 └──────────────────────────────────────────────────────────────────┘
 ```
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
 - Python 3.9+
-- [TwelveLabs API Key](https://api.twelvelabs.io/)
-- Video dataset organized by labels
-- [Try it out in Google Colab](https://colab.research.google.com/drive/1bRoJhDJufatNOIq8zJeo0Z6zoPaKk-Em?usp=sharing)
+- [TwelveLabs API Key](https://playground.twelvelabs.io/dashboard/api-keys)
 
 ### Installation
 
 ```bash
 # Clone the repository
-git clone <repository-url>
-cd voxel51
+git clone https://github.com/nathanchess/visual-ai-worker-safety-kit
+cd visual-ai-worker-safety-kit
 
 # Create virtual environment
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
 # Install dependencies
-pip install fiftyone twelvelabs python-dotenv torch torchvision opencv-python scikit-learn
+pip install fiftyone twelvelabs python-dotenv torch torchvision scikit-learn
 ```
 
 ### Configuration
@@ -87,120 +92,172 @@ Create a `.env` file in the project root:
 
 ```env
 # Required
-DATASET_PATH=/path/to/your/dataset
 TL_API_KEY=your_twelvelabs_api_key
 
 # Optional (with defaults)
-DATASET_NAME=workplace_surveillance_videos
+DATASET_NAME=safe_unsafe_behaviours
 DATASET_SPLIT=train
-DATASET_VIDEOS_PER_LABEL=3
+VIDEOS_PER_LABEL=3
+MIN_DURATION=4.0
+NUM_CLUSTERS=8
 TL_INDEX_NAME=fiftyone-twelvelabs-index
 ```
 
-### Dataset Structure
-
-```
-dataset/
-├── train/
-│   ├── 0_safe_walkway_violation/
-│   │   ├── video1.mp4
-│   │   └── video2.mp4
-│   ├── 1_unauthorized_intervention/
-│   │   └── ...
-│   └── ...
-└── test/
-    └── ...
-```
-
-### Running the Script
+### Running
 
 ```bash
-# Full workflow: ingest, cluster, label, visualize
+# Full workflow: ingest, embed, cluster, label, visualize
 python main.py
 
 # Skip video ingestion (use already indexed videos)
 python main.py --skip-ingestion
 
-# Export dataset only (no visualization)
+# Skip clustering (just fetch embeddings)
+python main.py --skip-ingestion --skip-clustering
+
+# Export DataLoader only (no visualization)
 python main.py --skip-ingestion --export-only
-
-# Custom number of clusters
-python main.py --num-clusters 10
-
-# Custom output path
-python main.py --output my_dataset.pt
 ```
 
-## 📋 Workflow Steps
+Or use the Jupyter notebook for an interactive walkthrough:
 
-1. **Video Ingestion** — Upload videos to TwelveLabs (filters out videos < 4s)
-2. **Embedding Generation** — Extract visual embeddings via Marengo 3.0
-3. **Semantic Clustering** — Group similar videos using KMeans
-4. **Auto-labeling** — Generate descriptive labels via Pegasus 1.2
-5. **Visualization** — Explore clusters in FiftyOne's interactive UI
-6. **Export** — Save as PyTorch dataset for downstream training
+```bash
+jupyter notebook main.ipynb
+```
 
-## 📦 Output
+## Dataset
 
-The script exports a `worker_safety_dataset.pt` file containing:
+The [Safe and Unsafe Behaviours Dataset](https://huggingface.co/datasets/Voxel51/Safe_and_Unsafe_Behaviours) is automatically downloaded from Hugging Face. It contains 8 classes:
 
-| Field        | Type          | Description                          |
-|--------------|---------------|--------------------------------------|
-| `embedding`  | Tensor        | 1024-dim visual embedding            |
-| `label_idx`  | Tensor        | Integer cluster ID                   |
-| `label_str`  | str           | Semantic label (e.g., "forklift_operation_safety") |
-| `video_id`   | str           | TwelveLabs video reference           |
+| Label | Description |
+|-------|-------------|
+| Safe Walkway Violation | Worker NOT using designated safe walkway |
+| Unauthorized Intervention | Accessing equipment without authorization |
+| Opened Panel Cover | Electrical/machinery panel left open |
+| Carrying Overload with Forklift | Forklift with excessive/unstable load |
+| Safe Walkway | Worker correctly using safe walkway |
+| Authorized Intervention | Proper procedures for equipment access |
+| Closed Panel Cover | Panels properly secured |
+| Safe Carrying | Forklift with appropriate load |
 
-### Loading the Dataset
+## Key FiftyOne Patterns
+
+This project demonstrates idiomatic FiftyOne patterns for efficient data workflows:
+
+### View Operations for Filtering
 
 ```python
-import torch
+from fiftyone import ViewField as F
 
-dataset = torch.load("worker_safety_dataset.pt")
-print(f"Dataset size: {len(dataset)}")
-
-# Access a sample
-sample = dataset[0]
-print(f"Embedding shape: {sample['embedding'].shape}")
-print(f"Label: {sample['label_str']}")
+# Chain filters declaratively
+view = (
+    dataset
+    .match_tags("train")
+    .match(F("metadata.duration") >= 4.0)
+    .match(~F("tl_video_id").exists())
+)
 ```
 
-## 🔧 CLI Options
+### Efficient Iteration with Autosave
 
-| Option              | Description                                      |
-|---------------------|--------------------------------------------------|
-| `--skip-ingestion`  | Skip video upload (use existing TwelveLabs index)|
-| `--export-only`     | Skip FiftyOne visualization                      |
-| `--num-clusters N`  | Number of KMeans clusters (default: 8)           |
-| `--output PATH`     | Output path for .pt file                         |
+```python
+# select_fields loads only what you need
+# autosave=True batches database writes
+for sample in view.select_fields("tl_video_id").iter_samples(
+    progress=True, autosave=True
+):
+    sample["tl_embedding"] = fetch_embedding(sample.tl_video_id)
+```
 
-## 🏆 Challenge Context
+### Batch Operations with values/set_values
 
-- **Event**: Visual AI Hackathon @ Northeastern
+```python
+# Extract field values as a list
+video_ids = indexed_view.values("tl_video_id")
+
+# Batch update all samples at once
+indexed_view.set_values("cluster", classifications)
+```
+
+### PyTorch Export with GetItem
+
+```python
+from fiftyone.utils.torch import GetItem
+
+class WorkerSafetyGetItem(GetItem):
+    @property
+    def required_keys(self):
+        return ["tl_embedding", "ground_truth"]
+    
+    def __call__(self, d):
+        return {
+            "embedding": torch.tensor(d.get("tl_embedding")),
+            "label_idx": self.label_to_idx[d.get("ground_truth").label],
+        }
+
+# Create PyTorch dataset from any FiftyOne view
+torch_dataset = indexed_view.to_torch(WorkerSafetyGetItem(LABEL_TO_IDX))
+```
+
+## Workflow Steps
+
+| Step | Tool | Description |
+|------|------|-------------|
+| **1. Ingest** | FiftyOne | Load dataset from Hugging Face with metadata |
+| **2. Index** | TwelveLabs | Upload videos, generate Marengo 3.0 embeddings |
+| **3. Retrieve** | TwelveLabs | Fetch 512-dim embeddings to FiftyOne samples |
+| **4. Cluster** | scikit-learn | Group similar videos with KMeans |
+| **5. Auto-label** | TwelveLabs Pegasus | Generate semantic labels per cluster |
+| **6. Visualize** | FiftyOne | Explore with UMAP + interactive app |
+| **7. Export** | FiftyOne `to_torch()` | Create PyTorch DataLoader |
+
+## Output
+
+The workflow creates a PyTorch `DataLoader` ready for training:
+
+```python
+for batch in train_loader:
+    embeddings = batch["embedding"]  # [batch_size, 512]
+    labels = batch["label_idx"]      # [batch_size]
+    
+    # Your training code here
+    outputs = model(embeddings)
+    loss = criterion(outputs, labels)
+```
+
+## CLI Options
+
+| Option | Description |
+|--------|-------------|
+| `--skip-ingestion` | Skip video upload (use existing TwelveLabs index) |
+| `--skip-clustering` | Skip clustering and auto-labeling |
+| `--export-only` | Skip FiftyOne visualization |
+| `--batch-size N` | Batch size for DataLoader (default: 4) |
+
+## Challenge Context
+
+- **Event**: 3rd CV4Smalls Workshop @ CVPR 2026
 - **Track**: Worker Safety Challenge
 - **Objective**: Build efficient video classifiers from small, curated datasets
 
-## 🔌 FiftyOne + Twelve Labs Plugin
+## Resources
 
-For enhanced semantic video search capabilities directly within FiftyOne, check out the official **FiftyOne + Twelve Labs Plugin**:
+### Documentation
+- [TwelveLabs Docs](https://docs.twelvelabs.io/)
+- [FiftyOne Docs](https://docs.voxel51.com/)
+- [FiftyOne Views Cheat Sheet](https://docs.voxel51.com/cheat_sheets/views_cheat_sheet.html)
+- [FiftyOne Filtering Cheat Sheet](https://docs.voxel51.com/cheat_sheets/filtering_cheat_sheet.html)
+
+### FiftyOne + TwelveLabs Plugin
+
+For enhanced semantic video search directly within FiftyOne:
 
 ```bash
 fiftyone plugins download https://github.com/danielgural/semantic_video_search
 ```
 
-**Key Features:**
-- 🧠 Generate multimodal embeddings (visual, audio, OCR) from full videos
-- 🔄 Automatically split videos into meaningful clips
-- 🔍 Run semantic search over indexed videos using natural language prompts
-- 📦 Store results in clip-level FiftyOne datasets
-
 [View Plugin Repository →](https://github.com/danielgural/semantic_video_search)
 
-## 📚 Resources
-
-- [TwelveLabs Documentation](https://docs.twelvelabs.io/)
-- [FiftyOne Documentation](https://docs.voxel51.com/)
-
-## 📄 License
+## License
 
 MIT License — See [LICENSE](LICENSE) for details.
